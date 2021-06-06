@@ -133,17 +133,3 @@ exports.deleteAll = (req, res) => {
             });
         });
 };
-
-// // Find all published Phones
-// exports.findAllPublished = (req, res) => {
-//     Phone.find({ published: true })
-//         .then(data => {
-//             res.send(data);
-//         })
-//         .catch(err => {
-//             res.status(500).send({
-//                 message:
-//                     err.message || "Some error occurred while retrieving Phones."
-//             });
-//         });
-// };
