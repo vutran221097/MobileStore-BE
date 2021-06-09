@@ -6,6 +6,7 @@ module.exports = mongoose => {
         type: String,
         required: true,
       },
+      image:String,
       category: {
         type: String,
         required: true,
@@ -21,7 +22,7 @@ module.exports = mongoose => {
         type: Number,
         required: true,
       },
-      available: Boolean,
+      available: String,
     }, {
       timestamps: true
     })
