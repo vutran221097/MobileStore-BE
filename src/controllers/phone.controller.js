@@ -9,7 +9,6 @@ exports.create = (req, res) => {
         category: req.body.category,
         description: req.body.description,
         guarantee: req.body.guarantee,
-        details: req.body.details,
         color: req.body.color,
         price: req.body.price,
         available: req.body.available,
@@ -80,15 +79,15 @@ exports.update = (req, res) => {
 
     Phone.findByIdAndUpdate(id, req.body, {
             useFindAndModify: false
+
         })
         .then(data => {
-            if (!data) {
-                res.status(404).send({
-                    message: `Cannot update Phone with id=${id}. Maybe Phone was not found!`
-                });
-            } else res.send({
-                message: "Phone was updated successfully."
-            });
+            data.image = req.file.filename || data.image,
+
+            data 
+                .save()
+                .then(() => res.json("The phone is update succesfully!"))
+                .catch(err => res.status(400).json(`Error: ${err}`));
         })
         .catch(err => {
             res.status(500).send({

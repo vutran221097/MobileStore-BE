@@ -16,7 +16,6 @@ module.exports = mongoose => {
         type: Number,
         required: true,
       },
-      details: String,
       color: String,
       price: {
         type: Number,
