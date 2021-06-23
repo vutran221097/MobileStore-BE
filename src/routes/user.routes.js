@@ -2,6 +2,7 @@ const {
   authJwt
 } = require("../middlewares");
 const UserController = require("../controllers/user.controller");
+const router = require("express").Router();
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -11,20 +12,18 @@ module.exports = function (app) {
     );
     next();
   });
-  
-  app.get(
-    "/users",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    UserController.findAll,
-    UserController.create,
-    UserController.deleteAll
-  );
 
-  app.get(
-    "/users/:id",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    UserController.findOne,
-    UserController.update,
-    UserController.delete
-  )
+  router.post("/", [authJwt.verifyToken, authJwt.isAdmin],  UserController.create);
+
+  router.get("/", [authJwt.verifyToken, authJwt.isAdmin], UserController.findAll);
+
+  router.get("/:id", [authJwt.verifyToken, authJwt.isAdmin], UserController.findOne);
+
+  router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], UserController.update);
+
+  router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], UserController.delete);
+
+  router.delete("/", [authJwt.verifyToken, authJwt.isAdmin], UserController.deleteAll);
+
+  app.use('/users', router);
 };

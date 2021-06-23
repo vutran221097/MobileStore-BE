@@ -12,23 +12,14 @@ function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       new Role({
-        name: "user"
+        name: "admin"
       }).save(err => {
         if (err) {
           console.log("error", err);
         }
       });
-
       new Role({
         name: "moderator"
-      }).save(err => {
-        if (err) {
-          console.log("error", err);
-        }
-      });
-
-      new Role({
-        name: "admin"
       }).save(err => {
         if (err) {
           console.log("error", err);
@@ -42,7 +33,8 @@ db.mongoose
   .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
   })
   .then(() => {
     console.log("Connected to the database!");
@@ -68,9 +60,10 @@ app.get("/", (req, res) => {
 });
 
 //routes
-require("./src/routes/phone.routes")(app);
+require('./src/routes/product.routes')(app);
 require('./src/routes/auth.routes')(app);
 require('./src/routes/user.routes')(app);
+require('./src/routes/news.routes')(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

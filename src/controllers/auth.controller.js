@@ -2,60 +2,81 @@ const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
+const ROLES = db.ROLES;
 
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 exports.signup = (req, res) => {
   const user = new User({
     username: req.body.username,
     email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8)
+    password: bcrypt.hashSync(req.body.password, 8),
   });
 
   user.save((err, user) => {
     if (err) {
-      res.status(500).send({ message: err });
+      res.status(500).send({
+        message: err
+      });
       return;
     }
 
     if (req.body.roles) {
-      Role.find(
-        {
-          name: { $in: req.body.roles }
+      Role.find({
+          name: {
+            $in: req.body.roles
+          }
         },
         (err, roles) => {
           if (err) {
-            res.status(500).send({ message: err });
+            res.status(500).send({
+              message: err
+            });
             return;
           }
 
-          user.roles = roles.map(role => role._id);
+          user.roles = roles.map(role =>role._id)
+
           user.save(err => {
             if (err) {
-              res.status(500).send({ message: err });
+              res.status(500).send({
+                message: err
+              });
               return;
             }
 
-            res.send({ message: "User was registered successfully!" });
+            res.send({
+              message: "User was registered successfully!"
+            });
           });
+
         }
       );
     } else {
-      Role.findOne({ name: "user" }, (err, role) => {
+      Role.findOne({
+        name: "moderator"
+      }, (err, role) => {
         if (err) {
-          res.status(500).send({ message: err });
+          res.status(500).send({
+            message: err
+          });
           return;
         }
 
         user.roles = [role._id];
+
         user.save(err => {
           if (err) {
-            res.status(500).send({ message: err });
+            res.status(500).send({
+              message: err
+            });
             return;
           }
 
-          res.send({ message: "User was registered successfully!" });
+          res.send({
+            message: "User was registered successfully!"
+          });
         });
       });
     }
@@ -64,20 +85,24 @@ exports.signup = (req, res) => {
 
 exports.signin = (req, res) => {
   User.findOne({
-    username: req.body.username
-  })
+      username: req.body.username
+    })
     .populate("roles", "-__v")
     .exec((err, user) => {
       if (err) {
-        res.status(500).send({ message: err });
+        res.status(500).send({
+          message: err
+        });
         return;
       }
 
       if (!user) {
-        return res.status(404).send({ message: "User Not found." });
+        return res.status(404).send({
+          message: "User Not found."
+        });
       }
 
-      var passwordIsValid = bcrypt.compareSync(
+      let passwordIsValid = bcrypt.compareSync(
         req.body.password,
         user.password
       );
@@ -89,11 +114,13 @@ exports.signin = (req, res) => {
         });
       }
 
-      var token = jwt.sign({ id: user.id }, config.secret, {
+      let token = jwt.sign({
+        id: user.id
+      }, config.secret, {
         expiresIn: 86400 // 24 hours
       });
 
-      var authorities = [];
+      let authorities = [];
 
       for (let i = 0; i < user.roles.length; i++) {
         authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
