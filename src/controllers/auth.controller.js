@@ -2,7 +2,6 @@ const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
-const ROLES = db.ROLES;
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -36,7 +35,8 @@ exports.signup = (req, res) => {
             return;
           }
 
-          user.roles = roles.map(role =>role._id)
+          user.roles = roles.map(role => role._id)
+          user.myrole = roles[0].name.toUpperCase()
 
           user.save(err => {
             if (err) {
@@ -65,6 +65,7 @@ exports.signup = (req, res) => {
         }
 
         user.roles = [role._id];
+        user.role = roles[0].name.toUpperCase()
 
         user.save(err => {
           if (err) {
@@ -80,6 +81,7 @@ exports.signup = (req, res) => {
         });
       });
     }
+
   });
 };
 

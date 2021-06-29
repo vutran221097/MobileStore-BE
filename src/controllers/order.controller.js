@@ -1,53 +1,42 @@
 const db = require("../models");
-const News = db.news;
+const Order = db.order;
 
 
 exports.create = (req, res) => {
 
-    const news = new News({
-        title: req.body.title,
-        body: req.body.body,
+    const order = new Order({
+        name: req.body.name,
+        phone: req.body.phone,
+        address: req.body.address,
+        cart: req.body.cart,
+        payMethod: req.body.payMethod,
+        totalPrice:req.body.totalPrice,
+        status: req.body.status
     });
 
-    news
-        .save(news)
+    order
+        .save(order)
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while creating the News."
+                message: err.message || "Some error occurred while creating the order."
             });
         });
 };
 
-
-exports.findAllNews = (req, res) => {
-    const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
-    const skip = parseInt(req.query.skip)
-    News.find({}).sort({
-            createdAt: -1
-        }).limit(limit).skip(skip)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving Newss."
-            });
-        });
-};
 
 exports.findAllAndPagination = async (req, res) => {
     try {
-        let query = News.find().sort({
+        let query = Order.find().sort({
             createdAt: -1
         });
 
         const page = parseInt(req.query.page) || 1;
         const pageSize = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * pageSize;
-        const total = await News.countDocuments();
+        const total = await Order.countDocuments();
 
         const pages = Math.ceil(total / pageSize);
         query = query.skip(skip).limit(pageSize);
@@ -59,22 +48,40 @@ exports.findAllAndPagination = async (req, res) => {
             count: result.length,
             page,
             pages,
-            news: result
+            order: result
         })
     } catch (error) {
         console.log(error)
     }
 };
 
+exports.findByPhoneNum = (req, res) => {
+    phoneNum_search = parseInt(req.params.phone);
+    Order.aggregate(
+            [{
+                $match: {
+                    phone: phoneNum_search,
+                }
+            }]
+        )
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving order."
+            });
+        });
+};
 
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    News.findById(id)
+    Order.findById(id)
         .then(data => {
             if (!data)
                 res.status(404).send({
-                    message: "Not found News with id " + id
+                    message: "Not found order with id " + id
                 });
             else res.send(data);
         })
@@ -82,7 +89,7 @@ exports.findOne = (req, res) => {
             res
                 .status(500)
                 .send({
-                    message: "Error retrieving News with id=" + id
+                    message: "Error retrieving order with id=" + id
                 });
         });
 };
@@ -96,7 +103,7 @@ exports.update = (req, res) => {
 
     const id = req.params.id;
 
-    News.findByIdAndUpdate(id, req.body)
+    Order.findByIdAndUpdate(id, req.body)
         .then(data => {
             if (!data) {
                 res.status(404).send({
@@ -115,35 +122,35 @@ exports.update = (req, res) => {
 
 exports.delete = (req, res) => {
     const id = req.params.id;
-    News.findByIdAndRemove(id)
+    Order.findByIdAndRemove(id)
         .then(data => {
             if (!data) {
                 res.status(404).send({
-                    message: `Cannot delete News with id=${id}. Maybe News was not found!`
+                    message: `Cannot delete order with id=${id}. Maybe order was not found!`
                 });
             } else {
                 res.send({
-                    message: "News was deleted successfully!"
+                    message: "order was deleted successfully!"
                 });
             }
         })
         .catch(err => {
             res.status(500).send({
-                message: "Could not delete News with id=" + id
+                message: "Could not delete order with id=" + id
             });
         });
 };
 
 exports.deleteAll = (req, res) => {
-    News.deleteMany({})
+    Order.deleteMany({})
         .then(data => {
             res.send({
-                message: `${data.deletedCount} Newss were deleted successfully!`
+                message: `${data.deletedCount} orders were deleted successfully!`
             });
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while removing all Newss."
+                message: err.message || "Some error occurred while removing all orders."
             });
         });
 };

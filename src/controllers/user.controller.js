@@ -1,26 +1,85 @@
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
-
+const bcrypt = require("bcryptjs");
 exports.create = async (req, res) => {
     // Create a user
     const user = new User({
         username: req.body.username,
         email: req.body.email,
-        password: req.body.password,
+        password: bcrypt.hashSync(req.body.password, 8),
     });
 
-    // Save user in the database
-    user
-        .save(user)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
+    user.save((err, user) => {
+        if (err) {
             res.status(500).send({
-                message: err.message || "Some error occurred while creating the user."
+                message: err
             });
-        });
+            return;
+        }
+
+        if (req.body.roles) {
+            Role.find({
+                    name: {
+                        $in: req.body.roles
+                    }
+                },
+                (err, roles) => {
+                    if (err) {
+                        res.status(500).send({
+                            message: err
+                        });
+                        return;
+                    }
+
+                    user.roles = roles.map(role => role._id)
+                    user.myrole = roles[0].name.toUpperCase()
+
+                    user.save(err => {
+                        if (err) {
+                            res.status(500).send({
+                                message: err
+                            });
+                            return;
+                        }
+
+                        res.send({
+                            message: "User was registered successfully!"
+                        });
+                    });
+
+                }
+            );
+        } else {
+            Role.findOne({
+                name: "moderator"
+            }, (err, role) => {
+                if (err) {
+                    res.status(500).send({
+                        message: err
+                    });
+                    return;
+                }
+
+                user.roles = [role._id];
+                user.role = roles[0].name.toUpperCase()
+
+                user.save(err => {
+                    if (err) {
+                        res.status(500).send({
+                            message: err
+                        });
+                        return;
+                    }
+
+                    res.send({
+                        message: "User was registered successfully!"
+                    });
+                });
+            });
+        }
+
+    });
 };
 
 exports.findAll = (req, res) => {
@@ -43,7 +102,6 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
     const id = req.params.id;
-
     User.findById(id)
         .then(data => {
             if (!data)
@@ -70,12 +128,13 @@ exports.update = (req, res) => {
     }
 
     const id = req.params.id;
+    req.body.password = bcrypt.hashSync(req.body.password)
 
     User.findByIdAndUpdate(id, req.body)
         .then(data => {
             data
                 .save()
-                .then(() => res.json("The Product is update succesfully!"))
+                .then(() => res.json("The user is update succesfully!"))
                 .catch(err => res.status(400).json(`Error: ${err}`));
         })
         .catch(err => {

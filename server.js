@@ -37,11 +37,11 @@ db.mongoose
     useFindAndModify: false
   })
   .then(() => {
-    console.log("Connected to the database!");
+    console.log("Connected to the MongoDB!");
     initial();
   })
   .catch(err => {
-    console.log("Cannot connect to the database!", err);
+    console.log("Cannot connect to the MongoDB!", err);
     process.exit();
   });
 
@@ -52,7 +52,6 @@ app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 
-// simple route
 app.get("/", (req, res) => {
   res.json({
     message: "Backend chạy thành công"
@@ -64,6 +63,7 @@ require('./src/routes/product.routes')(app);
 require('./src/routes/auth.routes')(app);
 require('./src/routes/user.routes')(app);
 require('./src/routes/news.routes')(app);
+require('./src/routes/order.routes')(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
