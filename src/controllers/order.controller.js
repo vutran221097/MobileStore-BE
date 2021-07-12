@@ -10,7 +10,7 @@ exports.create = (req, res) => {
         address: req.body.address,
         cart: req.body.cart,
         payMethod: req.body.payMethod,
-        totalPrice:req.body.totalPrice,
+        totalPrice: req.body.totalPrice,
         status: req.body.status
     });
 
@@ -29,26 +29,58 @@ exports.create = (req, res) => {
 
 exports.findAllAndPagination = async (req, res) => {
     try {
-        let query = Order.find().sort({
-            createdAt: -1
-        });
-
+        let condition = {};
         const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.limit) || 8;
+        const pageSize = parseInt(req.query.limit) || 4;
         const skip = (page - 1) * pageSize;
-        const total = await Order.countDocuments();
+        const sortByDate = req.query.sortByDate
+        const sortByStatus = req.query.sortByStatus
+        const sortByPhone = parseInt(req.query.sortByPhone)
 
-        const pages = Math.ceil(total / pageSize);
-        query = query.skip(skip).limit(pageSize);
+        if (req.query.sortByPhone) {
+            condition = {
+                phone: sortByPhone
+            }
+        }
 
+        if (req.query.sortByDate) {
+            sort = {
+                createdAt: sortByDate,
+            }
+        } else {
+            sort = {
+                status: sortByStatus,
+            }
+        }
+
+        let query = Order.find(
+            condition
+        )
+
+        const totalPage = await Order.find(
+            condition
+        ).countDocuments();
+
+        let totalOrderPhone = Order.find(condition)
+
+        let allOrder = Order.find({}).sort({
+            createdAt: -1
+        })
+
+        const pages = Math.ceil(totalPage / pageSize);
+        query = query.skip(skip).limit(pageSize).sort(sort)
         const result = await query;
+        const totalOrder = await allOrder;
+        const totalPhoneOrder = await totalOrderPhone;
 
         res.status(200).json({
             status: 'success',
             count: result.length,
             page,
             pages,
-            order: result
+            order: result,
+            totalPhone : totalPhoneOrder,
+            allOrder: totalOrder,
         })
     } catch (error) {
         console.log(error)
@@ -63,7 +95,9 @@ exports.findByPhoneNum = (req, res) => {
                     phone: phoneNum_search,
                 }
             }]
-        )
+        ).sort({
+            createdAt: -1
+        })
         .then(data => {
             res.send(data);
         })
@@ -107,15 +141,15 @@ exports.update = (req, res) => {
         .then(data => {
             if (!data) {
                 res.status(404).send({
-                    message: `Cannot update New with id=${id}. Maybe New was not found!`
+                    message: `Cannot update order with id=${id}. Maybe order was not found!`
                 });
             } else res.send({
-                message: "New was updated successfully."
+                data
             });
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating New with id=" + id
+                message: "Error updating order with id=" + id
             });
         });
 };

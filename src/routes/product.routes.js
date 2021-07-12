@@ -45,11 +45,9 @@ module.exports = function (app) {
     router.post("/", [authJwt.verifyToken, authJwt.isAdmin], upload.single("image"), ProductController.create);
     router.post("/", [authJwt.verifyToken, authJwt.isModerator], upload.single("image"), ProductController.create);
 
-    router.get("/allPhone/", ProductController.findAllPhone);
     router.get("/", ProductController.findAllAndPagination);
     router.get("/:id", ProductController.findOne);
 
-    router.get("/category/:category", ProductController.findCategory);
 
     router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], upload.single('image'), ProductController.update);
     router.put("/:id", [authJwt.verifyToken, authJwt.isModerator], upload.single('image'), ProductController.update);

@@ -13,10 +13,9 @@ module.exports = function (app) {
         next();
     });
 
-    router.post("/",OrderController.create);
+    router.post("/", OrderController.create);
+    router.get("/", OrderController.findAllAndPagination);
 
-    router.get("/",[authJwt.verifyToken, authJwt.isAdmin], OrderController.findAllAndPagination);
-    router.get("/",[authJwt.verifyToken, authJwt.isModerator], OrderController.findAllAndPagination);
     router.get("/:id", OrderController.findOne);
     router.get("/phone/:phone", OrderController.findByPhoneNum);
 

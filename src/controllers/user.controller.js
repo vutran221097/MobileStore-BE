@@ -17,7 +17,6 @@ exports.create = async (req, res) => {
             });
             return;
         }
-
         if (req.body.roles) {
             Role.find({
                     name: {
@@ -43,42 +42,12 @@ exports.create = async (req, res) => {
                             return;
                         }
 
-                        res.send({
-                            message: "User was registered successfully!"
-                        });
+                        res.send(user);
                     });
 
                 }
             );
-        } else {
-            Role.findOne({
-                name: "moderator"
-            }, (err, role) => {
-                if (err) {
-                    res.status(500).send({
-                        message: err
-                    });
-                    return;
-                }
-
-                user.roles = [role._id];
-                user.role = roles[0].name.toUpperCase()
-
-                user.save(err => {
-                    if (err) {
-                        res.status(500).send({
-                            message: err
-                        });
-                        return;
-                    }
-
-                    res.send({
-                        message: "User was registered successfully!"
-                    });
-                });
-            });
         }
-
     });
 };
 
@@ -106,7 +75,7 @@ exports.findOne = (req, res) => {
         .then(data => {
             if (!data)
                 res.status(404).send({
-                    message: "Not found user with id " + id
+                    message: "Not found User with id " + id
                 });
             else res.send(data);
         })
@@ -119,8 +88,7 @@ exports.findOne = (req, res) => {
         });
 };
 
-
-exports.update = (req, res) => {
+exports.changePassword = (req, res) => {
     if (!req.body) {
         return res.status(400).send({
             message: "Data to update can not be empty!"
@@ -128,18 +96,84 @@ exports.update = (req, res) => {
     }
 
     const id = req.params.id;
-    req.body.password = bcrypt.hashSync(req.body.password)
 
-    User.findByIdAndUpdate(id, req.body)
+    if (req.body.password) {
+        req.body.password = bcrypt.hashSync(req.body.password)
+        User.findByIdAndUpdate(id, req.body)
         .then(data => {
-            data
-                .save()
-                .then(() => res.json("The user is update succesfully!"))
-                .catch(err => res.status(400).json(`Error: ${err}`));
+            data.save().then(() => res.send(data))
         })
         .catch(err => {
             res.status(500).send({
                 message: "Error updating user with id=" + id
+            });
+        });
+    }
+}
+
+
+exports.update = (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Data to update can not be empty!"
+        });
+    }
+    const id = req.params.id;
+
+    if (req.body.password) {
+        req.body.password = bcrypt.hashSync(req.body.password)
+    }
+
+    User.findByIdAndUpdate(id, req.body)
+        .then((data) => {
+            if (req.body.myrole) {
+                data.save((err) => {
+                    if (err) {
+                        res.status(500).send({
+                            message: err
+                        });
+                        return;
+                    }
+
+                    Role.find({
+                        name: {
+                            $in: req.body.myrole
+                        }
+                    }, (err, roles) => {
+                        if (err) {
+                            res.status(500).send({
+                                message: err
+                            });
+                            return;
+                        }
+                        data.roles = roles.map(role => role._id)
+                        data.myrole = roles[0].name.toUpperCase()
+
+                        data.save(err => {
+                            if (err) {
+                                res.status(500).send({
+                                    message: err
+                                });
+                                return;
+                            }
+                            res.send(data);
+                        });
+                    })
+
+                })
+            } else {
+                data.save().then(() => res.send(data))
+                    .catch(err => {
+                        res.status(500).send({
+                            message: "Error updating user with id=" + id
+                        });
+                    });
+            }
+
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error updating User with id=" + id
             });
         });
 };

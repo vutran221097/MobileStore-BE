@@ -15,7 +15,6 @@ module.exports = function (app) {
     router.post("/", [authJwt.verifyToken, authJwt.isAdmin], NewsController.create);
     router.post("/", [authJwt.verifyToken, authJwt.isModerator], NewsController.create);
 
-    router.get("/allNews/", NewsController.findAllNews);
     router.get("/", NewsController.findAllAndPagination);
     router.get("/:id", NewsController.findOne);
 

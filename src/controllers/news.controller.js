@@ -22,25 +22,13 @@ exports.create = (req, res) => {
 };
 
 
-exports.findAllNews = (req, res) => {
-    const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
-    const skip = parseInt(req.query.skip)
-    News.find({}).sort({
-            createdAt: -1
-        }).limit(limit).skip(skip)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving Newss."
-            });
-        });
-};
-
 exports.findAllAndPagination = async (req, res) => {
     try {
         let query = News.find().sort({
+            createdAt: -1
+        });
+
+        let allNews = News.find().sort({
             createdAt: -1
         });
 
@@ -53,13 +41,15 @@ exports.findAllAndPagination = async (req, res) => {
         query = query.skip(skip).limit(pageSize);
 
         const result = await query;
+        const newss = await allNews;
 
         res.status(200).json({
             status: 'success',
             count: result.length,
             page,
             pages,
-            news: result
+            news: result,
+            allNews:newss
         })
     } catch (error) {
         console.log(error)

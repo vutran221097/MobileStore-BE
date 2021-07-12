@@ -21,6 +21,8 @@ module.exports = function (app) {
 
   router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], UserController.update);
 
+  router.put("/changepassword/:id", UserController.changePassword);
+
   router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], UserController.delete);
 
   router.delete("/", [authJwt.verifyToken, authJwt.isAdmin], UserController.deleteAll);

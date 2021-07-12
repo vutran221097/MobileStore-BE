@@ -7,17 +7,12 @@ basePath: /
 
 auth:
   path: /auth
-
   register:
     method: post
     path: /auth/signup
     params:
       username: string
       email: string
-      image: string
-      email: string
-      country: string
-      phone: sitrng
       password: string
       roles: array
       
@@ -35,7 +30,7 @@ auth:
 
 products:
   path: /products
-  create a phone:
+  create a product:
     path: /products
     method: post
     params: 
@@ -48,21 +43,15 @@ products:
       price: number
       available: string
 
-  get products by category:
-    path: /category/:category
-    method: get
-    response:
-      status: 200
-      data: products (list products of category)
 
   get products by id:
     path: /products/:id
     method: get
     response:
       status: 200
-      data: products (object phone)
+      data: products (object product)
 
-  get all phone:
+  get all product:
     path: /products
     method: get
     response:
@@ -75,7 +64,7 @@ products:
       response:
       status: 200
 
-  delete all phone:
+  delete all product:
     path: /products
     method: delete
       response:
@@ -104,10 +93,6 @@ users:
     params:
       username: string
       email: string
-      image: string
-      email: string
-      country: string
-      phone: sitrng
       password: string
       roles: array
     response:
@@ -120,12 +105,8 @@ users:
     params:
       username: string
       email: string
-      image: string
-      email: string
-      country: string
-      phone: sitrng
       password: string
-      roles: array
+      myrole : string
     response:
       status: 200
 

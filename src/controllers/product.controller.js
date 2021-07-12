@@ -32,68 +32,64 @@ exports.create = (req, res) => {
         });
 };
 
-exports.findAllPhone = (req, res) => {
-    const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
-    const skip = parseInt(req.query.skip)
-    Product.find({}).sort({
-            createdAt: -1
-        }).limit(limit).skip(skip)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving Products."
-            });
-        });
-}
 
 exports.findAllAndPagination = async (req, res) => {
     try {
-        let query = Product.find().sort({
-            createdAt: -1
-        });
-
+        let condition = {};
         const page = parseInt(req.query.page) || 1;
         const pageSize = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * pageSize;
-        const total = await Product.countDocuments();
+        const category = req.query.category
+        const sortByPrice = parseInt(req.query.sortByPrice)
+        const sortByDate = parseInt(req.query.sortByDate)
+
+        if (req.query.category) {
+            condition = {
+                category: category
+            }
+        }
+
+        if(req.query.sortByDate){
+            sort = {
+                createdAt:sortByDate
+            }
+        } else {
+            sort = {
+                price:sortByPrice
+            }
+        }
+
+        let query = Product.find(
+            condition
+        )
+        const total = await Product.find(
+            condition
+        ).countDocuments();
+
+        let allProduct = Product.find({}).sort({
+            createdAt: -1
+        })
 
         const pages = Math.ceil(total / pageSize);
-        query = query.skip(skip).limit(pageSize);
 
+        query = query.skip(skip).limit(pageSize).sort(sort)
         const result = await query;
+        const products = await allProduct;
 
         res.status(200).json({
             status: 'success',
             count: result.length,
             page,
             pages,
-            products: result
+            products: result,
+            allProduct: products
         })
     } catch (error) {
         console.log(error)
     }
 };
 
-exports.findCategory = (req, res) => {
-    category_search = req.params.category;
-    Product.aggregate(
-            [{
-                $match: {
-                    category: category_search,
-                }
-            }]
-        )
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving Products."
-            });
-        });
-};
+
 
 exports.findOne = (req, res) => {
     const id = req.params.id;
@@ -131,8 +127,8 @@ exports.update = (req, res) => {
 
                 data
                 .save()
-                .then(() => res.json("The Product is update succesfully!"))
-                .catch(err => res.status(400).json(`Error: ${err}`));
+                .then(() => res.send("The Product is update succesfully!"))
+                .catch(err => res.status(400).send(`Error: ${err}`));
         })
         .catch(err => {
             res.status(500).send({
