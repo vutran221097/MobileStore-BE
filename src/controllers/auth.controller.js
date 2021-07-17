@@ -100,7 +100,7 @@ exports.signin = (req, res) => {
 
       if (!user) {
         return res.status(404).send({
-          message: "User Not found."
+          message: "Không tìm thấy tài khoản."
         });
       }
 
@@ -112,7 +112,7 @@ exports.signin = (req, res) => {
       if (!passwordIsValid) {
         return res.status(401).send({
           accessToken: null,
-          message: "Invalid Password!"
+          message: "Nhập sai mật khẩu"
         });
       }
 
