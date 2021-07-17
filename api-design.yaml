@@ -28,44 +28,37 @@ auth:
         token: string
         user: object user
 
-products:
-  path: /products
+news:
+  path: /news
   create a product:
-    path: /products
+    path: /news
     method: post
     params: 
-      name: string
-      image: string
-      category: string
-      description: string
-      guarantee: number
-      color: string
-      price: number
-      available: string
+      title: string
+      body: string
 
-
-  get products by id:
-    path: /products/:id
+  get news by id:
+    path: /news/:id
     method: get
     response:
       status: 200
-      data: products (object product)
+      data: news (object product)
 
-  get all product:
-    path: /products
+  get all news:
+    path: /news
     method: get
     response:
       status: 200
-      data: products (list products)
+      data: news (list products)
 
-  delete products by id:
-    path: /products/:id
+  delete news by id:
+    path: /news/:id
     method: delete
       response:
       status: 200
 
-  delete all product:
-    path: /products
+  delete all news:
+    path: /news
     method: delete
       response:
       status: 200
@@ -114,4 +107,88 @@ users:
     path: /:id
     method: delete
     response:
+      status: 200
+
+products:
+  path: /products
+  create a product:
+    path: /products
+    method: post
+    params: 
+      name: string
+      image: string
+      category: string
+      description: string
+      guarantee: number
+      color: string
+      price: number
+      available: string
+
+
+  get products by id:
+    path: /products/:id
+    method: get
+    response:
+      status: 200
+      data: products
+
+  get all product:
+    path: /products
+    method: get
+    response:
+      status: 200
+      data: products (list products)
+
+  delete products by id:
+    path: /products/:id
+    method: delete
+      response:
+      status: 200
+
+  delete all product:
+    path: /products
+    method: delete
+      response:
+      status: 200
+
+      
+order:
+  path: /order
+  create an order:
+    path: /order
+    method: post
+    params: 
+      name: string
+      phone: number
+      address: string
+      cart: array
+      payMethod: string
+      totalPrice: number
+      status: number
+
+
+  get order by id:
+    path: /order/:id
+    method: get
+    response:
+      status: 200
+      data: order
+
+  get all order:
+    path: /order
+    method: get
+    response:
+      status: 200
+      data: order (list order)
+
+  delete order by id:
+    path: /order/:id
+    method: delete
+      response:
+      status: 200
+
+  delete all order:
+    path: /order
+    method: delete
+      response:
       status: 200
