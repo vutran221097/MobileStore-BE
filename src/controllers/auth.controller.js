@@ -1,4 +1,4 @@
-const config = require("../config/auth.config");
+require('dotenv').config();
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
@@ -118,7 +118,7 @@ exports.signin = (req, res) => {
 
       let token = jwt.sign({
         id: user.id
-      }, config.secret, {
+      }, process.env.SECRET_TOKEN, {
         expiresIn: 86400 // 24 hours
       });
 

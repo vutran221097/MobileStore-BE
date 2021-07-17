@@ -3,10 +3,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-
 const db = require("./src/models");
 const Role = db.role;
-const dbConfig = require("./src/config/db.config");
+require('dotenv').config();
 
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
@@ -30,7 +29,7 @@ function initial() {
 }
 
 db.mongoose
-  .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+  .connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -49,13 +48,16 @@ db.mongoose
 
 app.use(cors());
 app.use('/uploads', express.static('uploads'));
-app.use(bodyParser.json({ limit: '5mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
+app.use(bodyParser.json({
+  limit: '5mb'
+}));
+app.use(bodyParser.urlencoded({
+  extended: true,
+  limit: '5mb'
+}));
 
 app.get("/", (req, res) => {
-  res.json({
-    message: "Backend chạy thành công"
-  });
+  res.send("Back End chạy thành công")
 });
 
 //routes
