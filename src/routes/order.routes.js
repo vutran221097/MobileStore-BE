@@ -19,13 +19,10 @@ module.exports = function (app) {
     router.get("/:id", OrderController.findOne);
     router.get("/phone/:phone", OrderController.findByPhoneNum);
 
-    router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], OrderController.update);
-    router.put("/:id", [authJwt.verifyToken, authJwt.isModerator], OrderController.update);
+    router.put("/:id", [authJwt.verifyToken,authJwt.isModerator], OrderController.update);
 
-    router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], OrderController.delete);
     router.delete("/:id", [authJwt.verifyToken, authJwt.isModerator], OrderController.delete);
 
-    router.delete("/", [authJwt.verifyToken, authJwt.isAdmin], OrderController.deleteAll);
     router.delete("/", [authJwt.verifyToken, authJwt.isModerator], OrderController.deleteAll);
 
     app.use('/order', router);

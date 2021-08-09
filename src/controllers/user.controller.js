@@ -126,50 +126,7 @@ exports.update = (req, res) => {
 
     User.findByIdAndUpdate(id, req.body)
         .then((data) => {
-            if (req.body.myrole) {
-                data.save((err) => {
-                    if (err) {
-                        res.status(500).send({
-                            message: err
-                        });
-                        return;
-                    }
-
-                    Role.find({
-                        name: {
-                            $in: req.body.myrole
-                        }
-                    }, (err, roles) => {
-                        if (err) {
-                            res.status(500).send({
-                                message: err
-                            });
-                            return;
-                        }
-                        data.roles = roles.map(role => role._id)
-                        data.myrole = roles[0].name.toUpperCase()
-
-                        data.save(err => {
-                            if (err) {
-                                res.status(500).send({
-                                    message: err
-                                });
-                                return;
-                            }
-                            res.send(data);
-                        });
-                    })
-
-                })
-            } else {
                 data.save().then(() => res.send(data))
-                    .catch(err => {
-                        res.status(500).send({
-                            message: "Error updating user with id=" + id
-                        });
-                    });
-            }
-
         })
         .catch(err => {
             res.status(500).send({

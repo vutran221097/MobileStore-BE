@@ -42,20 +42,15 @@ module.exports = function (app) {
         fileFilter: fileFilter,
     });
 
-    router.post("/", [authJwt.verifyToken, authJwt.isAdmin], upload.single("image"), ProductController.create);
     router.post("/", [authJwt.verifyToken, authJwt.isModerator], upload.single("image"), ProductController.create);
 
     router.get("/", ProductController.findAllAndPagination);
     router.get("/:id", ProductController.findOne);
 
-
-    router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], upload.single('image'), ProductController.update);
     router.put("/:id", [authJwt.verifyToken, authJwt.isModerator], upload.single('image'), ProductController.update);
 
-    router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], ProductController.delete);
     router.delete("/:id", [authJwt.verifyToken, authJwt.isModerator], ProductController.delete);
 
-    router.delete("/", [authJwt.verifyToken, authJwt.isAdmin], ProductController.deleteAll);
     router.delete("/", [authJwt.verifyToken, authJwt.isModerator], ProductController.deleteAll);
 
     app.use('/products', router);
