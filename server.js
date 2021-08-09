@@ -5,6 +5,7 @@ const cors = require("cors");
 const app = express();
 const db = require("./src/models");
 const Role = db.role;
+// const User = db.user;
 require('dotenv').config();
 
 function initial() {
@@ -26,6 +27,12 @@ function initial() {
       });
     }
   });
+
+  // new User({
+  //   username: "admin",
+  //   email: "admin@gmail.com",
+  //   password: "mobilestore",
+  // })
 }
 
 db.mongoose
