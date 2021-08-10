@@ -8,6 +8,9 @@ const Role = db.role;
 // const User = db.user;
 require('dotenv').config();
 
+const { MongoClient } = require('mongodb');
+const uri = "mongodb+srv://mobilestore:MobileStore123@cluster0.bdxib.mongodb.net/mobile-store?retryWrites=true&w=majority";
+
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
@@ -36,7 +39,7 @@ function initial() {
 }
 
 db.mongoose
-  .connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`, {
+  .connect(uri, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
